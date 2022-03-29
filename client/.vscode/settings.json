@@ -4,5 +4,5 @@
     "source.fixAll.eslint": true
   },
   "git.ignoreLimitWarning": true,
-  "cSpell.words": ["Chakra"]
+  "cSpell.words": ["Chakra", "prefetch"]
 }

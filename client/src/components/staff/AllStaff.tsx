@@ -12,7 +12,7 @@ export function AllStaff(): ReactElement {
 
   return (
     <Box>
-      <Heading mt={10} alignItems="center">
+      <Heading mt={10} textAlign="center" alignItems="center">
         Our Staff
       </Heading>
       <HStack m={10} spacing={8} justify="center">

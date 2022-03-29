@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 
 import type { Treatment } from '../../../../../shared/types';
 import { axiosInstance } from '../../../axiosInstance';
@@ -13,4 +13,9 @@ async function getTreatments(): Promise<Treatment[]> {
 export function useTreatments(): Treatment[] {
   const { data = [] } = useQuery(queryKeys.treatments, getTreatments);
   return data;
+}
+
+export function usePreFetchTreatments(): void {
+  const client = useQueryClient();
+  client.prefetchQuery(queryKeys.treatments, getTreatments);
 }
