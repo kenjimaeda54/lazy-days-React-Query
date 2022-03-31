@@ -59,6 +59,12 @@ export function useUser(): UseUser {
   // meant to be called from useAuth
   function clearUser() {
     client.setQueriesData(queryKeys.user, null);
+    // estou colando o queryKeys.appointments porque esta query
+    // precisa ser invalidada, para refletir na tela de apontamento
+    // ela depende do mutation
+    // precisa a query que vai ser invalidada estar em primeiro
+    // exemplo queryKeys.appointments
+    client.removeQueries([queryKeys.appointments, queryKeys.userAppointments]);
   }
 
   return { user, updateUser, clearUser };

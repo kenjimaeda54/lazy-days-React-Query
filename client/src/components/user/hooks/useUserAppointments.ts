@@ -20,7 +20,12 @@ async function getUserAppointments(
 export function useUserAppointments(): Appointment[] {
   const { user } = useUser();
   const { data: appointments = [] } = useQuery(
-    'user-appointment',
+    // estou colando o queryKeys.appointments porque esta query
+    // precisa ser invalidada, para refletir na tela de apontamento
+    // ela depende do mutation
+    // precisa a query que vai ser invalidada estar em primeiro
+    // exemplo queryKeys.appointments
+    [queryKeys.appointments, queryKeys.userAppointments, queryKeys.user],
     () => getUserAppointments(user),
     {
       // essa query so vai ser executada se existir um user
