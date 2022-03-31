@@ -10,12 +10,16 @@ import {
   setStoredUser,
 } from '../../../user-storage';
 
-async function getUser(user: User | null): Promise<User | null> {
+async function getUser(
+  user: User | null,
+  signal: AbortSignal,
+): Promise<User | null> {
   if (!user) return null;
   const { data }: AxiosResponse<{ user: User }> = await axiosInstance.get(
     `/user/${user.id}`,
     {
       headers: getJWTHeader(user),
+      signal,
     },
   );
   return data.user;
@@ -32,22 +36,30 @@ export function useUser(): UseUser {
   // estou recebendo user, e enviando para getUser
   // para isto aqui nao ficar em um loop infitio ser a usado o setQueryData
   // https://react-query.tanstack.com/reference/QueryClient#queryclientsetquerydata
-  const { data: user } = useQuery(queryKeys.user, () => getUser(user), {
-    // toda vez que a pagina for carregada ou atualizada, vai chamar o initialData
-    // isto e para garantir que useQuery vai iniciar apos a pagina  ser carregada ou atualizada com
-    // valor prefixo,caso contrario precisaremos setar usuário novamente no local storage,
-    // nao esqueça no onSuccess estou apenas salvando,mas preciso de alguma forma recuperar também
-    initialData: getStoredUser(),
-    // onSuccess e sempre acionado quando o query for sucesso
-    // ou no setQueryData ou no useQUery
-    onSuccess: (received: User | null) => {
-      if (!received) {
-        clearStoredUser();
-      } else {
-        setStoredUser(received);
-      }
+  // signal e conceito de abortController
+  // https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+  // https://axios-http.com/docs/cancellation
+  // https://react-query.tanstack.com/guides/query-cancellation
+  const { data: user } = useQuery(
+    queryKeys.user,
+    ({ signal }) => getUser(user, signal),
+    {
+      // toda vez que a pagina for carregada ou atualizada, vai chamar o initialData
+      // isto e para garantir que useQuery vai iniciar apos a pagina  ser carregada ou atualizada com
+      // valor prefixo,caso contrario precisaremos setar usuário novamente no local storage,
+      // nao esqueça no onSuccess estou apenas salvando,mas preciso de alguma forma recuperar também
+      initialData: getStoredUser(),
+      // onSuccess e sempre acionado quando o query for sucesso
+      // ou no setQueryData ou no useQUery
+      onSuccess: (received: User | null) => {
+        if (!received) {
+          clearStoredUser();
+        } else {
+          setStoredUser(received);
+        }
+      },
     },
-  });
+  );
 
   // meant to be called from useAuth
   function updateUser(newUser: User): void {
