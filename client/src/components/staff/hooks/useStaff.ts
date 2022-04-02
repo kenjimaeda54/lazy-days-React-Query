@@ -27,7 +27,6 @@ export function useStaff(): UseStaff {
     [filter],
   );
 
-  // TODO: get data from server via useQuery
   const { data: staff = [] } = useQuery(queryKeys.staff, getStaff, {
     select: filter === 'all' ? undefined : filterFn,
   });
