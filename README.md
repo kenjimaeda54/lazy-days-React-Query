@@ -91,6 +91,7 @@ export const queryClient = new QueryClient({
 
 
 ```
+##
 - E possível tambem retornar no data do useQuery apenas os valores desejados, para isto usar o select, ele recebe uma função
 - Esta função normalmente aplica as regras que deseja, por exemplo, filtro .filter(()=>)
 - Para realizar atualização dos dados do usurário, implementei uma lógica complexa, com ela foi possível determinar se mantinha os valores anteriores ou os novos
