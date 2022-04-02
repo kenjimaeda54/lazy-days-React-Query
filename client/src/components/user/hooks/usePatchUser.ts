@@ -35,28 +35,33 @@ export function usePatchUser(): (newData: User | null) => void {
   const { mutate: patchUser } = useMutation(
     (newUser: User | null) => patchUserOnServer(newUser, user),
     {
+      // https://react-query.tanstack.com/reference/useMutation#_top
       // retorna um contexto, como callback caso de erro
-      onMutate: async (newData: User | null) => {
+      // valor que esta em useMutation vem para onMutate como callback
+      onMutate: async (newUser: User | null) => {
         // vamos cancelar as query para evitar sobrescrita de valores
-        clientQuery.cancelQueries([queryKeys.user]);
+        clientQuery.cancelQueries(queryKeys.user);
 
         // vamos recuperar os dados antes de dar erro
         const previousData: User = clientQuery.getQueryData(queryKeys.user);
-        // caso seja sucesso, optimizando o cacho com novo usuário
-        updateUser(newData);
 
-        // retorna um objeto
+        // salvar o usuário no cache
+        updateUser(newUser);
+
+        // retorna um objeto, para o contexto do useMutation
         return { previousData };
       },
+      // mesma coia que const = () => {}
       onError: (error, newData, context) => {
         if (context.previousData) {
           updateUser(context.previousData);
           toast({
-            title: 'Error updating user, restoring previous data',
-            status: 'error',
+            title: "Can't update user, save previous data",
+            status: 'warning',
           });
         }
       },
+      // ja esta sendo salvo no onMutate
       onSuccess: (newUser) => {
         if (newUser) {
           toast({
@@ -65,8 +70,9 @@ export function usePatchUser(): (newData: User | null) => void {
           });
         }
       },
+      // para atualizar o estado do componente
       onSettled: () => {
-        clientQuery.invalidateQueries([queryKeys.user]);
+        clientQuery.invalidateQueries(queryKeys.user);
       },
     },
   );
